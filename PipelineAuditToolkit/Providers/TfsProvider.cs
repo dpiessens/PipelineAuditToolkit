@@ -122,6 +122,8 @@ namespace PipelineAuditToolkit.Providers
             {
                 deployment.Changes.Add(new ChangeItem(change.Id, change.Timestamp.GetValueOrDefault(), change.Author.UniqueName, change.Message));
             }
+
+            deployment.CheckChangeViolations();
         }
 
         private async Task<Build> GetBuildForDeployment(ShallowReference definition, IProductionDeployment deployment)

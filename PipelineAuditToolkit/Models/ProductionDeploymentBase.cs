@@ -22,18 +22,35 @@ namespace PipelineAuditToolkit.Models
 
         public DateTime DeployDate { get; protected set; }
 
+        public string DeployUsers
+        {
+            get { return Users.Aggregate((a, b) => $"{a},{b}"); }
+        }
+
         public IProject DeploymentProject { get; protected set; }
         public IProductionDeployment PreviousDeployment { get; protected set; }
         public HashSet<string> Users { get; protected set; }
         public bool Errored { get; set; }
 
+        public bool HasViolations
+        {
+            get { return Changes.Any(c => c.IsViolation); }
+        }
         public IList<ChangeItem> Changes { get; set; }
         public int? BuildId { get; set; }
         public string CommitId { get; set; }
 
-        public IEnumerable<ChangeItem> GetChangeViolations()
+        public IList<ChangeItem> GetChangeViolations()
         {
-            return Changes.Where(c => Users.Contains(c.UserId));
+            return Changes.Where(c => c.IsViolation).ToList();
+        }
+
+        public void CheckChangeViolations()
+        {
+            foreach (var change in Changes)
+            {
+                change.IsViolation = Users.Contains(change.UserId);
+            }
         }
     }
 }

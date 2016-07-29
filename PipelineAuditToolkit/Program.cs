@@ -53,17 +53,16 @@ namespace PipelineAuditToolkit
                     logger.WriteInfo($"   Deployment Initiated By User(s): {deployment.Users.Aggregate((a, b) => $"{a},{b}")}");
                     logger.WriteInfo($"   Matching Build: {deployment.BuildNumber} on {deployment.BuildDate}");
 
-                    var violations = deployment.GetChangeViolations().ToList();
-                    if (!violations.Any())
+                    if (!deployment.HasViolations)
                     {
                         logger.WriteInfo("   Deployment has no violations for changes.");
                     }
                     else
                     {
                         logger.WriteInfo("   Deployment has change violations:");
-                        foreach (var changeItem in violations)
+                        foreach (var changeItem in deployment.GetChangeViolations())
                         {
-                            logger.WriteInfo($"     {changeItem.Id.Substring(0, 8)} {changeItem.Created.ToShortDateString()} {changeItem.UserId} {changeItem.Message}");
+                            logger.WriteInfo($"     {changeItem.FormattedId} {changeItem.Created.ToShortDateString()} {changeItem.UserId} {changeItem.Message}");
                         }
                     }
                 }

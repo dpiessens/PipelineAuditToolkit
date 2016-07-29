@@ -1,19 +1,93 @@
-﻿@using System;
-@using PipelineAuditToolkit.Models;
-@model System.Collections.Generic.List<Models.Project>
+﻿@using System
+@using PipelineAuditToolkit.Models
+@using PipelineAuditToolkit.Resources
+@inherits CustomTemplateBase<List<Project>>
 
 <head>
     <style>
+        #body {
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode';
+        }
+        .projects {
+            margin: 5px;
+        }
 
+        .project {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .deployments {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .deployment {
+
+        }
+        .header {
+            border-bottom: solid;
+            border-bottom-width: medium;
+            border-bottom-color: dimgrey;
+        }
+        .changeViolation {
+            color: darkred;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .change {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .headerViolations {
+            color: darkred;
+        }
+        .deployDate {
+
+        }
+        .deployName {
+
+        }
+        .build {
+
+        }
     </style>
 </head>
 <body>
-    <h1>Deployment Pipeline Report</h1>
+    <h1>Deployment Pipeline Report </h1>
     <h5>Generated on @DateTime.Now</h5>
     <hr />
     <br />
-    @foreach (Project p in Model)
-    {
-        <li>@p.name</li>
-    }
+    <div class="projects">
+        @foreach (IProject p in Model)
+        {
+            <div class="project">
+                <h3>@p.Name</h3>
+                <div class="deployments">
+                @foreach (IProductionDeployment deployment in p.Deployments)
+                {
+                    <div class="deployment">
+                        <div class="@(deployment.HasViolations ? "headerViolation" :"header")">
+                            <div class="deployDate">@deployment.DeployDate</div> - <div class="deployName">@deployment.Name</div>
+                        </div>
+                        <div class="deployedBy">
+                            Initiated By: @deployment.DeployUsers
+                        </div>
+                        <div class="build">
+                            Build: @deployment.BuildNumber on @deployment.BuildDate
+                        </div>
+                        <div class="changes">
+                            @foreach (ChangeItem change in deployment.Changes)
+                            {
+                                <div class="@(deployment.HasViolations ? "changeViolation" :"change")">
+                                    <div class="id">@change.FormattedId</div><div class="date">@change.Created.ToShortDateString()</div><div class="user">@change.UserId</div><div class="message">@change.Message</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                </div>
+            </div>
+        }
+    </div>
 </body>
