@@ -5,6 +5,7 @@ using PipelineAuditToolkit.Utility;
 using RazorEngine.Templating;
 using RazorEngine;
 using PipelineAuditToolkit.Resources;
+using RazorEngine.Configuration;
 
 namespace PipelineAuditToolkit
 {
@@ -33,9 +34,17 @@ namespace PipelineAuditToolkit
             {
                 Console.WriteLine();
                 logger.WriteInfo($"Checking Deployments for project: {project.Name}\n");
-                var deployments = octopusProvider.GetProductionDeploymentsForProject(project);
+                project.Deployments = octopusProvider.GetProductionDeploymentsForProject(project)
+                                                 .Where(d => !d.Errored)
+                                                 .ToList();
 
-                foreach (var deployment in deployments.Where(d => !d.Errored))
+                if (project.Deployments.Count == 0)
+                {
+                    logger.WriteDebug("No deployments for project, skipping...");
+                    continue;
+                }
+
+                foreach (var deployment in project.Deployments)
                 {
                     // Get matching build and revisions
                     tfsProvider.GetBuildAndRevisions(deployment).Wait();
@@ -58,12 +67,11 @@ namespace PipelineAuditToolkit
                         }
                     }
                 }
-                
             }
 
+            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "TestReport.pdf");
+            GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, projects);
 
-            GenerateReportFile(TemplateResources.RenderTemplate, "TestReport.pdf", deployments);
-            
             Console.WriteLine();
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
@@ -71,10 +79,16 @@ namespace PipelineAuditToolkit
 
         private static void GenerateReportFile<TModel>(string templateContent, string outputFile, TModel model)
         {
-            var templateKey = System.IO.Path.GetFileNameWithoutExtension(outputFile);
-            Engine.Razor.Compile(templateContent, templateKey);
+            var config = new TemplateServiceConfiguration();
+            config.DisableTempFileLocking = true;
+            config.Language = Language.CSharp;
+            
+            var service = RazorEngineService.Create(config);
 
-            var htmlContent = Engine.Razor.Run(templateKey, null, model);
+            var templateKey = System.IO.Path.GetFileNameWithoutExtension(outputFile);
+            service.Compile(templateContent, templateKey);
+
+            var htmlContent = service.Run(templateKey, null, model);
 
             var htmlToPdf = new NReco.PdfGenerator.HtmlToPdfConverter();
             htmlToPdf.GeneratePdf(htmlContent, null, outputFile);

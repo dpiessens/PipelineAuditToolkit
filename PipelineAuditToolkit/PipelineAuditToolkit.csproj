@@ -142,7 +142,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Resources\RenderTemplate.cshtml" />
+    <None Include="Resources\DeploymentAuditTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\TemplateResources.resx">

@@ -1,0 +1,19 @@
+﻿@using System;
+@using PipelineAuditToolkit.Models;
+@model System.Collections.Generic.List<Models.Project>
+
+<head>
+    <style>
+
+    </style>
+</head>
+<body>
+    <h1>Deployment Pipeline Report</h1>
+    <h5>Generated on @DateTime.Now</h5>
+    <hr />
+    <br />
+    @foreach (Project p in Model)
+    {
+        <li>@p.name</li>
+    }
+</body>

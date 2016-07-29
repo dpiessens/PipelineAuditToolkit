@@ -65,9 +65,9 @@ namespace PipelineAuditToolkit.Resources {
         ///    &lt;h1&gt;Test Me!&lt;/h1&gt;
         ///&lt;/body&gt;.
         /// </summary>
-        internal static string RenderTemplate {
+        internal static string DeploymentAuditTemplate {
             get {
-                return ResourceManager.GetString("RenderTemplate", resourceCulture);
+                return ResourceManager.GetString("DeploymentAuditTemplate", resourceCulture);
             }
         }
     }
