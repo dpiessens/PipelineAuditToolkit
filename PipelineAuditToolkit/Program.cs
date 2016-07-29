@@ -2,6 +2,9 @@
 using System.Linq;
 using PipelineAuditToolkit.Providers;
 using PipelineAuditToolkit.Utility;
+using RazorEngine.Templating;
+using RazorEngine;
+using PipelineAuditToolkit.Resources;
 
 namespace PipelineAuditToolkit
 {
@@ -56,11 +59,26 @@ namespace PipelineAuditToolkit
                     }
                 }
                 
-            }  
+            }
+
+
+            GenerateReportFile(TemplateResources.RenderTemplate, "TestReport.pdf", deployments);
             
             Console.WriteLine();
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+        }
+
+        private static void GenerateReportFile<TModel>(string templateContent, string outputFile, TModel model)
+        {
+            var templateKey = System.IO.Path.GetFileNameWithoutExtension(outputFile);
+            Engine.Razor.Compile(templateContent, templateKey);
+
+            var htmlContent = Engine.Razor.Run(templateKey, null, model);
+
+            var htmlToPdf = new NReco.PdfGenerator.HtmlToPdfConverter();
+            htmlToPdf.GeneratePdf(htmlContent, null, outputFile);
+            Console.WriteLine("Generated report at: {0}", outputFile);
         }
     }
 }
