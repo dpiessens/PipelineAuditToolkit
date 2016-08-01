@@ -115,12 +115,15 @@ namespace PipelineAuditToolkit.Providers
                 // As a backup get the raw commits between the two versions
                 var sourceChanges = await GetChangesByRevisions(build.Repository.Id, deployment.PreviousDeployment?.CommitId, deployment.CommitId);
                 sourceChanges.ForEach(c => deployment.Changes.Add(c));
+                deployment.CheckChangeViolations();
+
                 return;
             }
 
             foreach (var change in changes)
             {
                 deployment.Changes.Add(new ChangeItem(change.Id, change.Timestamp.GetValueOrDefault(), change.Author.UniqueName, change.Message));
+                
             }
 
             deployment.CheckChangeViolations();

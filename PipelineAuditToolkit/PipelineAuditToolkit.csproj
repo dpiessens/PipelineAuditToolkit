@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentCommandLineParser, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentCommandLineParser.1.4.3\lib\net35\FluentCommandLineParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Build2.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Build2.WebApi.dll</HintPath>
       <Private>True</Private>
@@ -128,6 +132,7 @@
     <Compile Include="Providers\RegexReleaseNotesBuildMatcher.cs" />
     <Compile Include="Providers\TfsProvider.cs" />
     <Compile Include="Resources\CustomTemplateBase.cs" />
+    <Compile Include="Resources\DisplayExtensions.cs" />
     <Compile Include="Resources\TemplateResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -137,6 +142,7 @@
     <Compile Include="Utility\IConfigurationSettings.cs" />
     <Compile Include="Utility\ILogger.cs" />
     <Compile Include="Utility\Logger.cs" />
+    <Compile Include="Utility\Options.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -144,12 +150,16 @@
     </None>
     <None Include="packages.config" />
     <None Include="Resources\DeploymentAuditTemplate.cshtml" />
+    <None Include="Resources\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\TemplateResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TemplateResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\GridStyles.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,6 +4,7 @@ using Octopus.Client;
 using Octopus.Client.Model;
 using PipelineAuditToolkit.Models;
 using PipelineAuditToolkit.Utility;
+using System;
 
 namespace PipelineAuditToolkit.Providers
 {
@@ -117,7 +118,7 @@ namespace PipelineAuditToolkit.Providers
                 DeployDate = deployment.Created.DateTime;
                 PreviousDeployment = previousDeployment;
                 ReleaseNotes = release.ReleaseNotes;
-                Users = new HashSet<string>(deploymentEvents.Items.Select(e => e.Username));
+                Users = new HashSet<string>(deploymentEvents.Items.Select(e => e.Username), StringComparer.InvariantCultureIgnoreCase);
             }
             
             public DeploymentResource Deployment { get; private set; }

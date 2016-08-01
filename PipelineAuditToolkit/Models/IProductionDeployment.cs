@@ -33,7 +33,7 @@ namespace PipelineAuditToolkit.Models
         IList<ChangeItem> Changes { get; }
         int? BuildId { get; set; }
         string CommitId { get; set; }
-        IEnumerable<ChangeItem> GetChangeViolations();
+        IList<ChangeItem> GetChangeViolations();
         void CheckChangeViolations();
     }
 }

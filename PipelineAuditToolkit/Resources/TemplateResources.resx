@@ -121,4 +121,7 @@
   <data name="DeploymentAuditTemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>deploymentaudittemplate.cshtml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="GridStyles" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>gridstyles.css;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

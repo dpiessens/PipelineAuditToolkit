@@ -61,13 +61,66 @@ namespace PipelineAuditToolkit.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;body&gt;
-        ///    &lt;h1&gt;Test Me!&lt;/h1&gt;
-        ///&lt;/body&gt;.
+        ///   Looks up a localized string similar to @using System
+        ///@using PipelineAuditToolkit.Models
+        ///@using PipelineAuditToolkit.Resources
+        ///@inherits CustomTemplateBase&lt;List&lt;IProject&gt;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;style&gt;
+        ///        #body {
+        ///            font-family:&apos;Lucida Sans&apos;, &apos;Lucida Sans Regular&apos;, &apos;Lucida Grande&apos;, &apos;Lucida Sans Unicode&apos;;
+        ///        }
+        ///        .projects {
+        ///            margin: 5px;
+        ///        }
+        ///
+        ///        .project {
+        ///            margin-left: 10px;
+        ///            margin-right: 10px;
+        ///        }
+        ///
+        ///        .deployments {
+        ///            margin-left: 10px;
+        ///         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DeploymentAuditTemplate {
             get {
                 return ResourceManager.GetString("DeploymentAuditTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to @-ms-viewport {
+        ///  width: device-width;
+        ///}
+        ///.visible-xs,
+        ///.visible-sm,
+        ///.visible-md,
+        ///.visible-lg {
+        ///  display: none !important;
+        ///}
+        ///.visible-xs-block,
+        ///.visible-xs-inline,
+        ///.visible-xs-inline-block,
+        ///.visible-sm-block,
+        ///.visible-sm-inline,
+        ///.visible-sm-inline-block,
+        ///.visible-md-block,
+        ///.visible-md-inline,
+        ///.visible-md-inline-block,
+        ///.visible-lg-block,
+        ///.visible-lg-inline,
+        ///.visible-lg-inline-block {
+        ///  display: none !important;
+        ///}
+        ///@media (max-width: 767px) {
+        ///  .visible-xs {
+        ///    display: block !importan [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GridStyles {
+            get {
+                return ResourceManager.GetString("GridStyles", resourceCulture);
             }
         }
     }
