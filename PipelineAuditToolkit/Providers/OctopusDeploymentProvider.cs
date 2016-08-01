@@ -5,38 +5,81 @@ using Octopus.Client.Model;
 using PipelineAuditToolkit.Models;
 using PipelineAuditToolkit.Utility;
 using System;
+using Fclp;
 
 namespace PipelineAuditToolkit.Providers
 {
     public class OctopusDeploymentProvider
     {
-        private readonly RegexReleaseNotesBuildMatcher _buildMatcher;
+        private readonly IBuildMatcher _buildMatcher;
         private readonly ILogger _logger;
         private readonly IConfigurationSettings _settings;
 
+        private string _serverAddress;
+        private string _apiKey;
+        private string _environmentName;
         private IOctopusRepository _octopus;
         private EnvironmentResource _prodEnv;
 
-        public OctopusDeploymentProvider(IConfigurationSettings settings, ILogger logger, 
-            RegexReleaseNotesBuildMatcher buildMatcher)
+        public OctopusDeploymentProvider(
+            IConfigurationSettings settings,
+            ILogger logger, 
+            IBuildMatcher buildMatcher,
+            IFluentCommandLineParser parser)
         {
             _settings = settings;
             _logger = logger;
             _buildMatcher = buildMatcher;
+
+            SetupOption(parser,
+                "octopusUrl",
+                "The server URL of the Octopus Deploy server to use.",
+                "Octopus.ServerUrl",
+                data => _serverAddress = data);
+
+            SetupOption(parser,
+                "octopusApiKey",
+                "The API Key of the Octopus Deploy server to use.",
+                "Octopus.ApiKey",
+                data => _apiKey = data);
+
+            SetupOption(parser,
+                "octopusEnv",
+                "The Octopus envrionment to validate, defaults to Prod",
+                "Octopus.ProdEnvName",
+                data => _environmentName = data);
+
+            SetupOption(parser,
+                "octopusEnv",
+                "The Octopus envrionment to validate, defaults to Prod",
+                "Octopus.ProdEnvName",
+                data => _environmentName = data);
+        }
+
+        private void SetupOption(
+            IFluentCommandLineParser parser, string name, string description, string configSetting, Action<string> callback, bool isRequired = true)
+        {
+            var option = parser.Setup<string>(name).WithDescription(description).Callback(callback);
+            var configSettingValue = _settings.GetApplicationSetting(configSetting);
+            if (!string.IsNullOrEmpty(configSettingValue))
+            {
+                option.SetDefault(configSettingValue);
+            }
+            else if (isRequired)
+            {
+                option.Required();
+            }
         }
 
         public void Initialize()
         {
-            var serverAddress = _settings.GetApplicationSetting("Octopus.ServerUrl");
-            var apiKey = _settings.GetApplicationSetting("Octopus.ApiKey");
-            var prodEnvName = _settings.GetApplicationSetting("Octopus.ProdEnvName");
-            _octopus = new OctopusRepository(new OctopusServerEndpoint(serverAddress, apiKey));
-
+            _octopus = new OctopusRepository(new OctopusServerEndpoint(_serverAddress, _apiKey));
+            
             // Get Production Environment
-            _prodEnv = _octopus.Environments.FindByName(prodEnvName);
+            _prodEnv = _octopus.Environments.FindByName(_environmentName);
             if (_prodEnv == null)
             {
-                _logger.WriteError($"Could not find environment '{prodEnvName}'");
+                _logger.WriteError($"Could not find environment '{_environmentName}'");
             }
         }
 

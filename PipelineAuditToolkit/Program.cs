@@ -23,9 +23,11 @@ namespace PipelineAuditToolkit
             var config = new ConfigurationSettings();
             var logger = new Logger(false, false);
 
-            var parser = GetCommandLineParser();
+            var globalOptions = new Options();
+            var parser = GetCommandLineParser(globalOptions);
+
             var buildMatcher = new RegexReleaseNotesBuildMatcher(logger);
-            var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher);
+            var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher, parser);
             var tfsProvider = new TfsProvider(config, logger);
 
             // Try to parse the command line
@@ -43,8 +45,6 @@ namespace PipelineAuditToolkit
                 parser.HelpOption.ShowHelp(parser.Options);
                 return;
             }
-
-            var globalOptions = parser.Object;
 
             octopusProvider.Initialize();
             tfsProvider.Initialize();
@@ -80,9 +80,8 @@ namespace PipelineAuditToolkit
                 }
             }
 
-            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "TestReport.pdf");
+            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "PipelineReport.pdf");
             GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, projects, logger, globalOptions.ShowReport);
-            Console.ReadLine();
         }
 
         private static void GenerateReportFile<TModel>(string templateContent, string outputFile, TModel model, ILogger logger, bool showReport)
@@ -131,22 +130,22 @@ namespace PipelineAuditToolkit
             }
         }
 
-        private static FluentCommandLineParser<Options> GetCommandLineParser()
+        private static IFluentCommandLineParser GetCommandLineParser(Options globalOptions)
         {
-            var parser = new FluentCommandLineParser<Options> { IsCaseSensitive = false };
+            var parser = new FluentCommandLineParser { IsCaseSensitive = false };
 
-            parser.Setup(o => o.ReportPath)
-                .As('o', "output")
+            parser.Setup<string>('o', "output")
                 .SetDefault(Environment.CurrentDirectory)
-                .WithDescription("The path to use when generating the report.");
+                .WithDescription("The path to use when generating the report.")
+                .Callback(o => globalOptions.ReportPath = o);
 
-            parser.Setup(o => o.ShowReport)
-                .As('s', "showReport")
-                .WithDescription("Indicates wither to display the report when completed.");
+            parser.Setup<bool>('s', "showReport")
+                .WithDescription("Indicates wither to display the report when completed.")
+                .Callback(o => globalOptions.ShowReport = o);
 
-            parser.Setup(o => o.ProjectFilter)
-                .As('f', "projectFilter")
-                .WithDescription("Filters the list of projects to query by down to a specific name");
+            parser.Setup<string>('f', "projectFilter")
+                .WithDescription("Filters the list of projects to query by down to a specific name")
+                .Callback(o => globalOptions.ProjectFilter = o);
 
             parser.SetupHelp("?", "help").Callback(text => Console.WriteLine(text));
                         
