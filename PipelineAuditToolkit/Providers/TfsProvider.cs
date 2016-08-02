@@ -8,52 +8,75 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using PipelineAuditToolkit.Models;
 using PipelineAuditToolkit.Utility;
+using Fclp;
 
 namespace PipelineAuditToolkit.Providers
 {
-    public class TfsProvider : IDisposable
+    public class TfsProvider : ProviderBase, IDisposable
     {
-        private readonly IConfigurationSettings _settings;
-        private readonly ILogger _logger;
-
         private BuildHttpClient _buildClient;
         private Guid _projectId;
         private GitHttpClient _gitClient;
 
+        private string _serverAddress;
+        private string _tfsUser;
+        private string _tfsApiKey;
+        private string _tfsProject;
 
-        public TfsProvider(IConfigurationSettings settings, ILogger logger)
+        public TfsProvider(IConfigurationSettings settings, ILogger logger, IFluentCommandLineParser parser) : 
+            base(logger, settings)
         {
-            _settings = settings;
-            _logger = logger;
             _projectId = Guid.Empty;
+
+            SetupOption(parser,
+                "tfsUrl",
+                "The server URL of the TFS server to use.",
+                "Tfs.ServerUrl",
+                data => _serverAddress = data);
+
+            SetupOption(parser,
+                "tfsUser",
+                "The user name used to authenticate to the TFS server.",
+                "Tfs.User",
+                data => _tfsUser = data,
+                false);
+
+            SetupOption(parser,
+                "tfsApiKey",
+                "The API key or password used to authenticate to the TFS server.",
+                "Tfs.ApiKey",
+                data => _tfsUser = data,
+                false);
+
+            SetupOption(parser,
+                "tfsProject",
+                "The TFS Project that contains the related builds to the deployments.",
+                "Tfs.Project",
+                data => _tfsProject = data);
         }
 
         public void Initialize()
         {
-            var tfsUrl = _settings.GetApplicationSetting("Tfs.ServerUrl");
-            var tfsUser = _settings.GetApplicationSetting("Tfs.User");
-            var tfsApiKey = _settings.GetApplicationSetting("Tfs.ApiKey");
-            var tfsProject = _settings.GetApplicationSetting("Tfs.Project");
+            var creds = !string.IsNullOrEmpty(_tfsUser) && !string.IsNullOrEmpty(_tfsApiKey)
+                            ? new VssCredentials(new VssBasicCredential(_tfsUser, _tfsApiKey))
+                            : new VssCredentials();
 
-            var creds = new VssCredentials(new VssBasicCredential(tfsUser, tfsApiKey))
-            {
-                PromptType = CredentialPromptType.DoNotPrompt
-            };
+            creds.PromptType = CredentialPromptType.DoNotPrompt;
 
-            _logger.WriteDebug($"Getting TFS Project ID for name: {tfsProject}");
-            using (var generalClient = new ProjectHttpClient(new Uri(tfsUrl), creds))
+            _logger.WriteDebug($"Getting TFS Project ID for name: {_tfsProject}");
+            using (var generalClient = new ProjectHttpClient(new Uri(_serverAddress), creds))
             {
-                var project = generalClient.GetProjects().Result.FirstOrDefault(p => string.Equals(p.Name, tfsProject));
+                var project = generalClient.GetProjects().Result.FirstOrDefault(p => string.Equals(p.Name, _tfsProject));
                 if (project == null)
                 {
-                    _logger.WriteError($"ERROR Cannot get project name: {tfsProject}");
+                    _logger.WriteError($"ERROR Cannot get project name: {_tfsProject}");
                     return;
                 }
 
                 _projectId = project.Id;
             }
 
-            var tfsUri = new Uri(tfsUrl);
+            var tfsUri = new Uri(_serverAddress);
             _buildClient = new BuildHttpClient(tfsUri, creds);
             _gitClient = new GitHttpClient(tfsUri, creds);
         }

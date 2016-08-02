@@ -28,7 +28,7 @@ namespace PipelineAuditToolkit
 
             var buildMatcher = new RegexReleaseNotesBuildMatcher(logger);
             var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher, parser);
-            var tfsProvider = new TfsProvider(config, logger);
+            var tfsProvider = new TfsProvider(config, logger, parser);
 
             // Try to parse the command line
             var result = parser.Parse(args);

@@ -129,6 +129,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\IBuildMatcher.cs" />
     <Compile Include="Providers\OctopusDeploymentProvider.cs" />
+    <Compile Include="Providers\ProviderBase.cs" />
     <Compile Include="Providers\RegexReleaseNotesBuildMatcher.cs" />
     <Compile Include="Providers\TfsProvider.cs" />
     <Compile Include="Resources\CustomTemplateBase.cs" />

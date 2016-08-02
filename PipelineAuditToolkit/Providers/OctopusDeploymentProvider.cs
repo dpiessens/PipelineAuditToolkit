@@ -9,12 +9,10 @@ using Fclp;
 
 namespace PipelineAuditToolkit.Providers
 {
-    public class OctopusDeploymentProvider
+    public class OctopusDeploymentProvider : ProviderBase
     {
         private readonly IBuildMatcher _buildMatcher;
-        private readonly ILogger _logger;
-        private readonly IConfigurationSettings _settings;
-
+        
         private string _serverAddress;
         private string _apiKey;
         private string _environmentName;
@@ -25,10 +23,9 @@ namespace PipelineAuditToolkit.Providers
             IConfigurationSettings settings,
             ILogger logger, 
             IBuildMatcher buildMatcher,
-            IFluentCommandLineParser parser)
+            IFluentCommandLineParser parser) : 
+            base(logger, settings)
         {
-            _settings = settings;
-            _logger = logger;
             _buildMatcher = buildMatcher;
 
             SetupOption(parser,
@@ -54,21 +51,6 @@ namespace PipelineAuditToolkit.Providers
                 "The Octopus envrionment to validate, defaults to Prod",
                 "Octopus.ProdEnvName",
                 data => _environmentName = data);
-        }
-
-        private void SetupOption(
-            IFluentCommandLineParser parser, string name, string description, string configSetting, Action<string> callback, bool isRequired = true)
-        {
-            var option = parser.Setup<string>(name).WithDescription(description).Callback(callback);
-            var configSettingValue = _settings.GetApplicationSetting(configSetting);
-            if (!string.IsNullOrEmpty(configSettingValue))
-            {
-                option.SetDefault(configSettingValue);
-            }
-            else if (isRequired)
-            {
-                option.Required();
-            }
         }
 
         public void Initialize()
