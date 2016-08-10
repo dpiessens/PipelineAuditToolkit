@@ -24,7 +24,7 @@ namespace PipelineAuditToolkit.Models
 
         public string DeployUsers
         {
-            get { return Users.Aggregate((a, b) => $"{a},{b}"); }
+            get { return Users.Count > 0 ? Users.Aggregate((a, b) => $"{a},{b}") : String.Empty; }
         }
 
         public IProject DeploymentProject { get; protected set; }

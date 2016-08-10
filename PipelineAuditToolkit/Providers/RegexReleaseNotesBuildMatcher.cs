@@ -6,7 +6,7 @@ namespace PipelineAuditToolkit.Providers
 {
     public class RegexReleaseNotesBuildMatcher : IBuildMatcher
     {
-        private const string MatchRegex = @"Release created by Build \[(?<buildname>[A-Za-z _0-9]+)\#(?<buildnumber>[0-9.]+)\]";
+        private const string MatchRegex = @"Release created by Build \[(?<buildname>[A-Za-z _0-9\-]+)\#(?<buildnumber>[0-9.]+)\]";
 
         private readonly ILogger _logger;
         private readonly Regex _releaseLocateRegex;
