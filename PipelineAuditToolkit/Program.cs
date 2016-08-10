@@ -42,7 +42,8 @@ namespace PipelineAuditToolkit
             if (result.HelpCalled)
             {
                 // triggers the SetupHelp Callback which writes the text to the console
-                parser.HelpOption.ShowHelp(parser.Options);
+                Console.WriteLine("Press any key to continue ...");
+                Console.ReadKey();
                 return;
             }
 
@@ -80,7 +81,7 @@ namespace PipelineAuditToolkit
                 }
             }
 
-            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "PipelineReport.pdf");
+            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, String.Format("PipelineReport_{0}", DateTime.Now.ToString("yyyyMMddHHmmssfff")));
             GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, projects, logger, globalOptions.ShowReport);
         }
 
@@ -120,8 +121,16 @@ namespace PipelineAuditToolkit
                     Right = 5
                 }
             };
-            
+
+            // To write to PDF
+            outputFile = outputFile + ".pdf";
             htmlToPdf.GeneratePdf(htmlContent, null, outputFile);
+
+            // To write to HTML
+            //outputFile = outputFile + ".htm";
+            //System.IO.File.WriteAllText(outputFile, htmlContent);
+
+
             logger.WriteInfo($"Generated report at: {outputFile}");
 
             if (showReport)
