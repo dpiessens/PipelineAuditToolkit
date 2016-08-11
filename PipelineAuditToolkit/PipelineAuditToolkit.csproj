@@ -133,6 +133,7 @@
     <Compile Include="Providers\RegexReleaseNotesBuildMatcher.cs" />
     <Compile Include="Providers\TfsProvider.cs" />
     <Compile Include="Resources\CustomTemplateBase.cs" />
+    <Compile Include="Resources\DeploymentAuditTemplateViewModel.cs" />
     <Compile Include="Resources\DisplayExtensions.cs" />
     <Compile Include="Resources\TemplateResources.Designer.cs">
       <AutoGen>True</AutoGen>

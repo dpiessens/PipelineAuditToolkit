@@ -1,7 +1,7 @@
 ﻿@using System
 @using PipelineAuditToolkit.Models
 @using PipelineAuditToolkit.Resources
-@inherits CustomTemplateBase<List<IProject>>
+@inherits CustomTemplateBase<DeploymentAuditTemplateViewModel>
 
 <head>
     <!-- import GridStyles.css -->
@@ -30,11 +30,15 @@
 </head>
 <body>
     <h1>Deployment Pipeline Report </h1>
+    @if (Model.HasDates)
+    {
+        <h3>@Model.DateRange</h3>
+    }
     <h5>Generated on @DateTime.Now</h5>
     <hr />
     <br />
     <div class="container">
-        @foreach (IProject p in Model)
+        @foreach (IProject p in Model.Projects)
         {
             <div class="row header">
                 <div class="col-xs-12">

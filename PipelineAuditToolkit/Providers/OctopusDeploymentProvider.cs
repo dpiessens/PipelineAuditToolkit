@@ -92,11 +92,14 @@ namespace PipelineAuditToolkit.Providers
                         .ToList();
         }
 
-        public List<IProductionDeployment> GetProductionDeploymentsForProject(IProject project)
+        public List<IProductionDeployment> GetProductionDeploymentsForProject(IProject project, DateTime? startDate, DateTime? endDate)
         {
             var prodDeployments = new List<IProductionDeployment>();
 
-            var deployments = _octopus.Deployments.FindAll(new[] { project.Id }, new[] { _prodEnv.Id }).Items.OrderBy(d => d.Created);
+            var deployments = _octopus.Deployments.FindAll(new[] { project.Id }, new[] { _prodEnv.Id })
+                                                  .Items
+                                                  .Where(d => (!startDate.HasValue || d.Created >= startDate.Value) && (!endDate.HasValue || d.Created <= endDate.Value))
+                                                  .OrderBy(d => d.Created);
 
             foreach (var deployment in deployments)
             {

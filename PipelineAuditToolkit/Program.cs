@@ -62,7 +62,7 @@ namespace PipelineAuditToolkit
             {
                 Console.WriteLine();
                 logger.WriteInfo($"Checking Deployments for project: {project.Name}\n");
-                project.Deployments = octopusProvider.GetProductionDeploymentsForProject(project)
+                project.Deployments = octopusProvider.GetProductionDeploymentsForProject(project, globalOptions.StartDate, globalOptions.EndDate)
                                                  .Where(d => !d.Errored)
                                                  .ToList();
 
@@ -81,6 +81,13 @@ namespace PipelineAuditToolkit
             }
 
             var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "PipelineReport.pdf");
+            var viewModel = new DeploymentAuditTemplateViewModel
+            {
+                EndDate = globalOptions.EndDate,
+                Projects = projects,
+                StartDate = globalOptions.StartDate
+            };
+
             GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, projects, logger, globalOptions.ShowReport);
         }
 
@@ -146,6 +153,14 @@ namespace PipelineAuditToolkit
             parser.Setup<string>('f', "projectFilter")
                 .WithDescription("Filters the list of projects to query by down to a specific name")
                 .Callback(o => globalOptions.ProjectFilter = o);
+
+            parser.Setup<DateTime?>("startDate")
+                .WithDescription("The start date for only reporting on a range of deployments")
+                .Callback(o => globalOptions.StartDate = o);
+
+            parser.Setup<DateTime?>("endDate")
+                .WithDescription("The end date for only reporting on a range of deployments")
+                .Callback(o => globalOptions.EndDate = o);
 
             parser.SetupHelp("?", "help").Callback(text => Console.WriteLine(text));
                         
