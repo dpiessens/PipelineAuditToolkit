@@ -27,9 +27,10 @@ namespace PipelineAuditToolkit
             var globalOptions = new Options();
             var parser = GetCommandLineParser(globalOptions);
 
+            var usernameTransformer = new UsernameTransformer(config, logger);
             var buildMatcher = new RegexReleaseNotesBuildMatcher(logger);
-            var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher, parser);
-            var tfsProvider = new TfsProvider(config, logger, parser);
+            var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher, parser, usernameTransformer);
+            var tfsProvider = new TfsProvider(config, logger, parser, usernameTransformer);
 
             // Try to parse the command line
             var result = parser.Parse(args);
@@ -49,6 +50,7 @@ namespace PipelineAuditToolkit
                 return;
             }
 
+            usernameTransformer.Initalize();
             octopusProvider.Initialize();
             tfsProvider.Initialize();
 

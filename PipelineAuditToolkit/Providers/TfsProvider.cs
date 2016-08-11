@@ -14,6 +14,8 @@ namespace PipelineAuditToolkit.Providers
 {
     public class TfsProvider : ProviderBase, IDisposable
     {
+        private readonly IUsernameTransformer _usernameTransformer;
+
         private BuildHttpClient _buildClient;
         private Guid _projectId;
         private GitHttpClient _gitClient;
@@ -23,10 +25,11 @@ namespace PipelineAuditToolkit.Providers
         private string _tfsApiKey;
         private string _tfsProject;
 
-        public TfsProvider(IConfigurationSettings settings, ILogger logger, IFluentCommandLineParser parser) : 
+        public TfsProvider(IConfigurationSettings settings, ILogger logger, IFluentCommandLineParser parser, IUsernameTransformer usernameTransformer) : 
             base(logger, settings)
         {
             _projectId = Guid.Empty;
+            _usernameTransformer = usernameTransformer;
 
             SetupOption(parser,
                 "tfsUrl",
@@ -145,8 +148,8 @@ namespace PipelineAuditToolkit.Providers
 
             foreach (var change in changes)
             {
-                deployment.Changes.Add(new ChangeItem(change.Id, change.Timestamp.GetValueOrDefault(), change.Author.UniqueName, change.Message));
-                
+                var userName = _usernameTransformer.GetEmailAddress(change.Author.UniqueName);
+                deployment.Changes.Add(new ChangeItem(change.Id, change.Timestamp.GetValueOrDefault(), userName, change.Message));
             }
 
             deployment.CheckChangeViolations();

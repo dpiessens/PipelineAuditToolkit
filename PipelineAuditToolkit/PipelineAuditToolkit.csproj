@@ -128,10 +128,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\IBuildMatcher.cs" />
+    <Compile Include="Providers\IUsernameTransformer.cs" />
     <Compile Include="Providers\OctopusDeploymentProvider.cs" />
     <Compile Include="Providers\ProviderBase.cs" />
     <Compile Include="Providers\RegexReleaseNotesBuildMatcher.cs" />
     <Compile Include="Providers\TfsProvider.cs" />
+    <Compile Include="Providers\UsernameTransformer.cs" />
     <Compile Include="Resources\CustomTemplateBase.cs" />
     <Compile Include="Resources\DeploymentAuditTemplateViewModel.cs" />
     <Compile Include="Resources\DisplayExtensions.cs" />

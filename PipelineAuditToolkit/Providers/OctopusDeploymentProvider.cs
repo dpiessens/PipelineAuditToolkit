@@ -12,7 +12,8 @@ namespace PipelineAuditToolkit.Providers
     public class OctopusDeploymentProvider : ProviderBase
     {
         private readonly IBuildMatcher _buildMatcher;
-        
+        private readonly IUsernameTransformer _usernameTransformer;
+
         private string _serverAddress;
         private string _apiKey;
         private string _environmentName;
@@ -23,10 +24,12 @@ namespace PipelineAuditToolkit.Providers
             IConfigurationSettings settings,
             ILogger logger, 
             IBuildMatcher buildMatcher,
-            IFluentCommandLineParser parser) : 
+            IFluentCommandLineParser parser,
+            IUsernameTransformer usernameTransformer) : 
             base(logger, settings)
         {
             _buildMatcher = buildMatcher;
+            _usernameTransformer = usernameTransformer;
 
             SetupOption(parser,
                 "octopusUrl",
@@ -106,7 +109,7 @@ namespace PipelineAuditToolkit.Providers
                 var previousDeployment = prodDeployments.LastOrDefault();
 
                 // Create wrapper object
-                var deploymentWrapper = new OctopusProductionDeployment(project, deployment, release, deploymentEvents, previousDeployment);
+                var deploymentWrapper = new OctopusProductionDeployment(project, deployment, release, deploymentEvents, previousDeployment, _usernameTransformer);
 
                 if (!_buildMatcher.FindMatchingBuild(deploymentWrapper))
                 {
@@ -126,7 +129,8 @@ namespace PipelineAuditToolkit.Providers
         internal class OctopusProductionDeployment : ProductionDeploymentBase
         {
             public OctopusProductionDeployment(IProject project, DeploymentResource deployment, 
-                ReleaseResource release, ResourceCollection<EventResource> deploymentEvents, IProductionDeployment previousDeployment)
+                ReleaseResource release, ResourceCollection<EventResource> deploymentEvents, 
+                IProductionDeployment previousDeployment, IUsernameTransformer usernameTransformer)
             {
                 // Octopus Objects
                 Deployment = deployment;
@@ -140,7 +144,7 @@ namespace PipelineAuditToolkit.Providers
                 DeployDate = deployment.Created.DateTime;
                 PreviousDeployment = previousDeployment;
                 ReleaseNotes = release.ReleaseNotes;
-                Users = new HashSet<string>(deploymentEvents.Items.Select(e => e.Username), StringComparer.InvariantCultureIgnoreCase);
+                Users = new HashSet<string>(deploymentEvents.Items.Select(e => usernameTransformer.GetEmailAddress(e.Username)), StringComparer.InvariantCultureIgnoreCase);
             }
             
             public DeploymentResource Deployment { get; private set; }
