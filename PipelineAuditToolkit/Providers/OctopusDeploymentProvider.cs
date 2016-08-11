@@ -45,12 +45,6 @@ namespace PipelineAuditToolkit.Providers
                 "The Octopus envrionment to validate, defaults to Prod",
                 "Octopus.ProdEnvName",
                 data => _environmentName = data);
-
-            SetupOption(parser,
-                "octopusEnv",
-                "The Octopus envrionment to validate, defaults to Prod",
-                "Octopus.ProdEnvName",
-                data => _environmentName = data);
         }
 
         public void Initialize()

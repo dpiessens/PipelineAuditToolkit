@@ -119,7 +119,7 @@ namespace PipelineAuditToolkit.Providers
             deployment.BuildId = build.Id;
             deployment.CommitId = build.SourceVersion;
 
-            var previousBuild = deployment.PreviousDeployment.BuildId;
+            var previousBuild = deployment.PreviousDeployment != null ? deployment.PreviousDeployment.BuildId : null;
 
             List<Change> changes;
             try
