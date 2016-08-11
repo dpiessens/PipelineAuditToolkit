@@ -98,7 +98,7 @@ namespace PipelineAuditToolkit.Providers
             foreach (var deployment in deployments)
             {
                 // Get releases for each deployment
-                var deploymentEvents = _octopus.Events.List(regardingDocumentId: $"{deployment.TaskId},{deployment.Id}");
+                var deploymentEvents = _octopus.Events.List(regardingDocumentId: deployment.Id);
                 
                 // Get the release for the deployment
                 var release = _octopus.Releases.Get(deployment.ReleaseId);
