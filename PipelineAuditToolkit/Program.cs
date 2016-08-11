@@ -8,6 +8,7 @@ using PipelineAuditToolkit.Resources;
 using RazorEngine.Configuration;
 using System.Diagnostics;
 using Fclp;
+using System.Text;
 
 namespace PipelineAuditToolkit
 {
@@ -36,6 +37,7 @@ namespace PipelineAuditToolkit
             if (result.HasErrors)
             {
                 Console.WriteLine(result.ErrorText);
+                Console.Read();
                 return;
             }
 
@@ -81,8 +83,7 @@ namespace PipelineAuditToolkit
                 }
             }
 
-            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, String.Format("PipelineReport_{0}", DateTime.Now.ToString("yyyyMMddHHmmssfff")));
-            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, "PipelineReport.pdf");
+            var reportPath = System.IO.Path.Combine(Environment.CurrentDirectory, string.Format("PipelineReport_{0}", DateTime.Now.ToString("yyyyMMddHHmmssfff")));
             var viewModel = new DeploymentAuditTemplateViewModel
             {
                 EndDate = globalOptions.EndDate,
@@ -90,7 +91,7 @@ namespace PipelineAuditToolkit
                 StartDate = globalOptions.StartDate
             };
 
-            GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, projects, logger, globalOptions.ShowReport);
+            GenerateReportFile(TemplateResources.DeploymentAuditTemplate, reportPath, viewModel, logger, globalOptions.ShowReport);
         }
 
         private static void GenerateReportFile<TModel>(string templateContent, string outputFile, TModel model, ILogger logger, bool showReport)
@@ -164,17 +165,30 @@ namespace PipelineAuditToolkit
                 .WithDescription("Filters the list of projects to query by down to a specific name")
                 .Callback(o => globalOptions.ProjectFilter = o);
 
-            parser.Setup<DateTime?>("startDate")
+            parser.Setup<DateTime>("startDate")
                 .WithDescription("The start date for only reporting on a range of deployments")
                 .Callback(o => globalOptions.StartDate = o);
 
-            parser.Setup<DateTime?>("endDate")
+            parser.Setup<DateTime>("endDate")
                 .WithDescription("The end date for only reporting on a range of deployments")
-                .Callback(o => globalOptions.EndDate = o);
+                .Callback(o => globalOptions.EndDate = o.ToEndOfDay());
 
-            parser.SetupHelp("?", "help").Callback(text => Console.WriteLine(text));
+            parser.SetupHelp("h", "?", "help").Callback(text => Console.WriteLine(GenerateHelpText(text)));
                         
             return parser;
+        }
+
+        private static string GenerateHelpText(string commandLineOptions)
+        {
+            var builder = new StringBuilder("Delivery Pipeline Toolkit");
+            builder.AppendLine("Generates reports documenting SoC for a pipeline");
+            builder.AppendLine();
+            builder.Append(commandLineOptions);
+            builder.AppendLine();
+            builder.AppendLine("Example:");
+            builder.AppendLine("PipelineAuditToolikit.exe /octopusUrl https://my.octopusserver.com /octopusApiKey API-ABC123 /tfsUrl https://my.visualstudio.com /tfsApiKey abc123 /tfsProject \"My Project\"");
+            
+            return builder.ToString();
         }
     }
 }

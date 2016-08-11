@@ -13,15 +13,15 @@ namespace PipelineAuditToolkit.Resources
             {
                 if (StartDate.HasValue && EndDate.HasValue)
                 {
-                    return $"{StartDate.Value.ToReportDateTime()} to {EndDate.Value.ToReportDateTime()}";
+                    return $"{StartDate.Value:d} to {EndDate.Value:d}";
                 }
                 else if (StartDate.HasValue)
                 {
-                    return $"Beginning {StartDate.Value.ToReportDateTime()}";
+                    return $"Beginning {StartDate.Value:d}";
                 }
                 else if (EndDate.HasValue)
                 {
-                    return $"Before {EndDate.Value.ToReportDateTime()}";
+                    return $"Before {EndDate.Value:d}";
                 }
 
                 return string.Empty;

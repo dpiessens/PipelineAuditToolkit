@@ -45,7 +45,7 @@ namespace PipelineAuditToolkit.Providers
                 "tfsApiKey",
                 "The API key or password used to authenticate to the TFS server.",
                 "Tfs.ApiKey",
-                data => _tfsUser = data,
+                data => _tfsApiKey = data,
                 false);
 
             SetupOption(parser,
@@ -57,8 +57,8 @@ namespace PipelineAuditToolkit.Providers
 
         public void Initialize()
         {
-            var creds = !string.IsNullOrEmpty(_tfsUser) && !string.IsNullOrEmpty(_tfsApiKey)
-                            ? new VssCredentials(new VssBasicCredential(_tfsUser, _tfsApiKey))
+            var creds = !string.IsNullOrEmpty(_tfsUser) || !string.IsNullOrEmpty(_tfsApiKey)
+                            ? new VssCredentials(new VssBasicCredential(_tfsUser ?? string.Empty, _tfsApiKey))
                             : new VssCredentials();
 
             creds.PromptType = CredentialPromptType.DoNotPrompt;
