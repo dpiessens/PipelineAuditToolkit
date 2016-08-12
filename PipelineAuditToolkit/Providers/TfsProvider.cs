@@ -191,8 +191,8 @@ namespace PipelineAuditToolkit.Providers
             }
 
             var commits = await _gitClient.GetCommitsAsync(_projectId, repositoryId, query);
-
-            return commits.Select(c => new ChangeItem(c.CommitId, c.Author.Date, c.Author.Email, c.Comment)).ToList();
+            
+            return commits.Select(c => new ChangeItem(c.CommitId, c.Author.Date, _usernameTransformer.GetEmailAddress(c.Author.Email), c.Comment)).ToList();
         }
     }
 }
