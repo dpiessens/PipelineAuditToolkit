@@ -30,7 +30,6 @@ namespace PipelineAuditToolkit
             var usernameTransformer = new UsernameTransformer(config, logger);
             var buildMatcher = new RegexReleaseNotesBuildMatcher(logger);
             var octopusProvider = new OctopusDeploymentProvider(config, logger, buildMatcher, parser, usernameTransformer);
-            var tfsProvider = new TfsProvider(config, logger, parser, usernameTransformer);
 
             // Try to parse the command line
             var result = parser.Parse(args);
@@ -52,7 +51,6 @@ namespace PipelineAuditToolkit
 
             usernameTransformer.Initalize();
             octopusProvider.Initialize();
-            tfsProvider.Initialize();
 
             // Get projects
             var projects = octopusProvider.GetProjects();
@@ -75,13 +73,6 @@ namespace PipelineAuditToolkit
                 {
                     logger.WriteDebug("No deployments for project, skipping...");
                     continue;
-                }
-
-                foreach (var deployment in project.Deployments)
-                {
-                    // Get matching build and revisions
-                    logger.WriteInfo($"   Getting details for deployment {deployment.Id} '{deployment.Name}'");
-                    tfsProvider.GetBuildAndRevisions(deployment).Wait();
                 }
             }
 
@@ -176,7 +167,7 @@ namespace PipelineAuditToolkit
                 .Callback(o => globalOptions.EndDate = o.ToEndOfDay());
 
             parser.SetupHelp("h", "?", "help").Callback(text => Console.WriteLine(GenerateHelpText(text)));
-                        
+
             return parser;
         }
 
@@ -189,7 +180,7 @@ namespace PipelineAuditToolkit
             builder.AppendLine();
             builder.AppendLine("Example:");
             builder.AppendLine("PipelineAuditToolikit.exe /octopusUrl https://my.octopusserver.com /octopusApiKey API-ABC123 /tfsUrl https://my.visualstudio.com /tfsApiKey abc123 /tfsProject \"My Project\"");
-            
+
             return builder.ToString();
         }
     }

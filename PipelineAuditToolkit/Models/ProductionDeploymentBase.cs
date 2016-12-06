@@ -31,11 +31,6 @@ namespace PipelineAuditToolkit.Models
         public IProductionDeployment PreviousDeployment { get; protected set; }
         public HashSet<string> Users { get; protected set; }
         public bool Errored { get; set; }
-
-        public bool HasViolations
-        {
-            get { return Changes.Any(c => c.IsViolation); }
-        }
         public IList<ChangeItem> Changes { get; set; }
         public int? BuildId { get; set; }
         public string CommitId { get; set; }

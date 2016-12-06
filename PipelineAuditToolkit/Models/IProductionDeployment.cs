@@ -16,8 +16,6 @@ namespace PipelineAuditToolkit.Models
 
         bool Errored { get; }
 
-        bool HasViolations { get; }
-
         string BuildNumber { get; set; }
         string ReleaseNotes { get; }
         string BuildName { get; set; }
@@ -28,7 +26,7 @@ namespace PipelineAuditToolkit.Models
 
         HashSet<string> Users { get; }
         DateTime BuildDate { get; set; }
-        DateTime DeployDate { get;  }
+        DateTime DeployDate { get; }
         string DeployUsers { get; }
         IList<ChangeItem> Changes { get; }
         int? BuildId { get; set; }
